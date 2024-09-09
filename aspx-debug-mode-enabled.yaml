@@ -1,0 +1,38 @@
+id: aspx-debug-mode-enabled
+
+info:
+  name: ASPX Debug Mode Enabled
+  author: your_name
+  severity: high
+  description: Detects if ASPX debug mode is enabled by sending specific requests and checking for debug-specific responses.
+  tags: aspx, debug, bugbounty
+
+requests:
+  - method: POST
+    path:
+      - "{{BaseURL}}/Foobar-debug.aspx"
+
+    headers:
+      Command: "stop-debug"
+      Content-Length: "2"
+
+    body: "OK"
+
+    matchers:
+      - type: word
+        words:
+          - "OK"
+          - "Debug"
+          - "Stack Trace"
+          - "ASP.NET"
+          - "Compilation"
+
+      - type: status
+        status:
+          - 200
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "(OK|Debug|Trace|Compilation|ASP.NET)"
